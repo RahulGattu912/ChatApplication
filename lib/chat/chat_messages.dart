@@ -1,6 +1,7 @@
-import 'package:chat_app_demo/themes/light_mode.dart';
+import 'package:chat_app_demo/themes/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatMessages extends StatefulWidget {
   final String chatRoomId;
@@ -13,10 +14,26 @@ class ChatMessages extends StatefulWidget {
 }
 
 class _ChatMessagesState extends State<ChatMessages> {
-  ThemeData themeData = lightMode;
-  TextTheme textTheme = theme;
+  FocusNode focusNode = FocusNode();
+  @override
+  void initState() {
+    super.initState();
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        Future.delayed(const Duration(microseconds: 300), () => scrollDown());
+      }
+    });
+  }
+
+  final ScrollController _scrollController = ScrollController();
+  void scrollDown() {
+    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
+  }
+
   @override
   Widget build(BuildContext context) {
+    ThemeData themeData = Provider.of<ThemeProvider>(context).themeData;
     return Scaffold(
       backgroundColor: themeData.colorScheme.tertiary,
       body: StreamBuilder(
@@ -30,14 +47,14 @@ class _ChatMessagesState extends State<ChatMessages> {
             if (snapshot.hasError) {
               return Text(
                 'Error',
-                style: textTheme.titleLarge,
+                style: themeData.textTheme.titleLarge,
               );
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return Center(
                 child: Text(
                   'No Message Yet!',
-                  style: textTheme.titleLarge,
+                  style: themeData.textTheme.titleLarge,
                 ),
               );
             }
@@ -45,20 +62,21 @@ class _ChatMessagesState extends State<ChatMessages> {
               return Center(
                 child: Text(
                   'Loading...',
-                  style: textTheme.titleLarge,
+                  style: themeData.textTheme.titleLarge,
                 ),
               );
             }
             return ListView(
+              controller: _scrollController,
               children: snapshot.data!.docs
-                  .map((doc) => _buildMessageItem(doc))
+                  .map((doc) => _buildMessageItem(doc, themeData))
                   .toList(),
             );
           }),
     );
   }
 
-  Widget _buildMessageItem(DocumentSnapshot doc) {
+  Widget _buildMessageItem(DocumentSnapshot doc, ThemeData themeData) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     bool isSender = data['senderId'] == widget.senderId;
 
@@ -67,7 +85,6 @@ class _ChatMessagesState extends State<ChatMessages> {
       child: Align(
         alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
-          // Let the container size itself based on the text content
           decoration: BoxDecoration(
             color: isSender ? Colors.green : Colors.grey[300],
             borderRadius: BorderRadius.only(
@@ -80,12 +97,15 @@ class _ChatMessagesState extends State<ChatMessages> {
           child: Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            child: Text(
-              data['message'],
-              style: TextStyle(
-                  fontSize: 16,
-                  color: isSender ? Colors.white : Colors.black54),
-            ),
+            child: Text(data['message'],
+                style: themeData.textTheme.titleLarge?.copyWith(
+                    color: isSender ? Colors.white : Colors.black54,
+                    fontSize: 16)
+                // TextStyle(
+
+                //     fontSize: 16,
+                //     color: isSender ? Colors.white : Colors.black54),
+                ),
           ),
         ),
       ),

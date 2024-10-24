@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-TextTheme theme =
-    TextTheme(titleLarge: GoogleFonts.spaceMono(color: Colors.grey.shade600));
-
 ThemeData lightMode = ThemeData(
+    textTheme:
+        TextTheme(titleLarge: GoogleFonts.spaceMono(color: Colors.black54)),
     colorScheme: ColorScheme.light(
         primary: Colors.grey.shade600,
         secondary: Colors.grey.shade300,

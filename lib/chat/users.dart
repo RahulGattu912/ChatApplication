@@ -1,8 +1,10 @@
 import 'package:chat_app_demo/chat/chat_room.dart';
-import 'package:chat_app_demo/themes/light_mode.dart';
+import 'package:chat_app_demo/chat/count_messages.dart';
+import 'package:chat_app_demo/themes/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Users extends StatefulWidget {
   const Users({super.key});
@@ -12,11 +14,9 @@ class Users extends StatefulWidget {
 }
 
 class _UsersState extends State<Users> {
-  ThemeData themeData = lightMode;
-  TextTheme textTheme = theme;
-
   @override
   Widget build(BuildContext context) {
+    ThemeData themeData = Provider.of<ThemeProvider>(context).themeData;
     return Scaffold(
         backgroundColor: themeData.colorScheme.tertiary,
         body: StreamBuilder(
@@ -33,7 +33,7 @@ class _UsersState extends State<Users> {
             if (!snapshot.hasData) {
               return Text(
                 'No Users Found',
-                style: textTheme.titleLarge,
+                style: themeData.textTheme.titleLarge,
               );
             }
             List<DocumentSnapshot> users = snapshot.data!.docs;
@@ -53,42 +53,72 @@ class _UsersState extends State<Users> {
                   return Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                          color: themeData.colorScheme.secondary,
-                          borderRadius: BorderRadius.circular(16)),
-                      child: Center(
-                          child: Row(
-                        children: [
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          const Icon(Icons.person),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            userMap[index]['email'],
-                            style: textTheme.titleLarge
-                                ?.copyWith(color: themeData.colorScheme.shadow),
-                          ),
-                          const Spacer(),
-                          IconButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ChatRoom(
-                                              senderID: currentUid!,
-                                              receiverID: userMap[index]['uid'],
-                                              receiverMail: userMap[index]
-                                                  ['email'],
-                                            )));
-                              },
-                              icon: const Icon(Icons.message))
-                        ],
-                      )),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ChatRoom(
+                                      senderID: currentUid!,
+                                      receiverID: userMap[index]['uid'],
+                                      receiverMail: userMap[index]['email'],
+                                    )));
+                      },
+                      child: Stack(clipBehavior: Clip.none, children: [
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                              color: themeData.colorScheme.shadow,
+                              borderRadius: BorderRadius.circular(16)),
+                          child: Center(
+                              child: Row(
+                            children: [
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Icon(
+                                Icons.person,
+                                color: themeData.colorScheme.tertiary,
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                userMap[index]['email'],
+                                style: themeData.textTheme.titleLarge?.copyWith(
+                                    color: themeData.colorScheme.tertiary),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => ChatRoom(
+                                                  senderID: currentUid!,
+                                                  receiverID: userMap[index]
+                                                      ['uid'],
+                                                  receiverMail: userMap[index]
+                                                      ['email'],
+                                                )));
+                                  },
+                                  icon: Icon(
+                                    Icons.message,
+                                    color: themeData.colorScheme.tertiary,
+                                  )),
+                              const SizedBox(
+                                width: 12,
+                              ),
+                            ],
+                          )),
+                        ),
+                        // Positioned(
+                        //     top: -8,
+                        //     right: -8,
+                        //     child: CountMessages(
+                        //       chatRoomId: '',
+                        //     )),
+                      ]),
                     ),
                   );
                 });

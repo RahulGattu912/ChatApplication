@@ -1,8 +1,10 @@
 import 'package:chat_app_demo/chat/users.dart';
 import 'package:chat_app_demo/login/login_page.dart';
-import 'package:chat_app_demo/themes/light_mode.dart';
+import 'package:chat_app_demo/themes/theme_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:chat_app_demo/settings/settings.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,20 +14,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  TextTheme textTheme = theme;
-  ThemeData themeData = lightMode;
-  bool _isLoggingOut = false; // To manage loading state
+  bool _isLoggingOut = false;
 
   @override
   Widget build(BuildContext context) {
+    ThemeData themeData = Provider.of<ThemeProvider>(context).themeData;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: themeData.colorScheme.tertiary,
+        iconTheme: IconThemeData(color: themeData.colorScheme.shadow),
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
           'Home Page',
-          style: textTheme.titleLarge,
+          style: themeData.textTheme.titleLarge
+              ?.copyWith(color: themeData.colorScheme.shadow),
         ),
       ),
       backgroundColor: themeData.colorScheme.tertiary,
@@ -40,7 +43,7 @@ class _HomePageState extends State<HomePage> {
               const Spacer(flex: 2),
               Text(
                 'Welcome,',
-                style: textTheme.titleLarge?.copyWith(
+                style: themeData.textTheme.titleLarge?.copyWith(
                   color: themeData.colorScheme.shadow,
                   fontSize: 28,
                 ),
@@ -48,7 +51,7 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: Text(
                   'Home',
-                  style: textTheme.titleLarge?.copyWith(fontSize: 20),
+                  style: themeData.textTheme.titleLarge?.copyWith(fontSize: 20),
                 ),
                 trailing: Icon(
                   Icons.home,
@@ -65,8 +68,14 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: Text(
                   'Settings',
-                  style: textTheme.titleLarge?.copyWith(fontSize: 20),
+                  style: themeData.textTheme.titleLarge?.copyWith(fontSize: 20),
                 ),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SettingsPage()));
+                },
                 trailing: Icon(
                   Icons.settings,
                   color: themeData.colorScheme.primary,
@@ -76,7 +85,7 @@ class _HomePageState extends State<HomePage> {
               ListTile(
                 title: Text(
                   'Log Out',
-                  style: textTheme.titleLarge?.copyWith(
+                  style: themeData.textTheme.titleLarge?.copyWith(
                       fontSize: 20, color: themeData.colorScheme.shadow),
                 ),
                 trailing: _isLoggingOut

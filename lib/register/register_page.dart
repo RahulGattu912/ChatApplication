@@ -1,9 +1,9 @@
 import 'package:chat_app_demo/login/login_page.dart';
-import 'package:chat_app_demo/themes/light_mode.dart';
+import 'package:chat_app_demo/themes/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -13,8 +13,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  ThemeData themeData = lightMode;
-  TextTheme textTheme = theme;
+  // ThemeData themeData = lightMode;
   final TextEditingController _email = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _confirmPassword = TextEditingController();
@@ -23,6 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData themeData = Provider.of<ThemeProvider>(context).themeData;
     return Scaffold(
       backgroundColor: themeData.colorScheme.tertiary,
       body: SafeArea(
@@ -37,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
             const SizedBox(
               height: 20,
             ),
-            Text('Sign Up to continue', style: textTheme.titleLarge),
+            Text('Sign Up to continue', style: themeData.textTheme.titleLarge),
             const SizedBox(
               height: 20,
             ),
@@ -46,12 +46,13 @@ class _RegisterPageState extends State<RegisterPage> {
               child: SizedBox(
                   height: 52,
                   child: TextField(
-                    style: textTheme.titleLarge
+                    cursorColor: themeData.colorScheme.shadow,
+                    style: themeData.textTheme.titleLarge
                         ?.copyWith(color: themeData.colorScheme.shadow),
                     controller: _email,
                     decoration: InputDecoration(
                       hintText: 'Email',
-                      hintStyle: textTheme.titleLarge,
+                      hintStyle: themeData.textTheme.titleLarge,
                       border: OutlineInputBorder(
                         borderSide:
                             BorderSide(color: themeData.colorScheme.secondary),
@@ -69,7 +70,8 @@ class _RegisterPageState extends State<RegisterPage> {
               child: SizedBox(
                   height: 52,
                   child: TextField(
-                      style: textTheme.titleLarge
+                      cursorColor: themeData.colorScheme.shadow,
+                      style: themeData.textTheme.titleLarge
                           ?.copyWith(color: themeData.colorScheme.shadow),
                       controller: _password,
                       obscureText: _isObscure,
@@ -80,12 +82,15 @@ class _RegisterPageState extends State<RegisterPage> {
                               _isObscure = !_isObscure;
                             });
                           },
-                          child: Icon(_isObscure
-                              ? Icons.visibility_off
-                              : Icons.visibility),
+                          child: Icon(
+                            _isObscure
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: themeData.colorScheme.shadow,
+                          ),
                         ),
                         hintText: 'Password',
-                        hintStyle: textTheme.titleLarge,
+                        hintStyle: themeData.textTheme.titleLarge,
                         border: OutlineInputBorder(
                           borderSide: BorderSide(
                               color: themeData.colorScheme.secondary),
@@ -102,7 +107,8 @@ class _RegisterPageState extends State<RegisterPage> {
               child: SizedBox(
                   height: 52,
                   child: TextField(
-                      style: textTheme.titleLarge
+                      cursorColor: themeData.colorScheme.shadow,
+                      style: themeData.textTheme.titleLarge
                           ?.copyWith(color: themeData.colorScheme.shadow),
                       controller: _confirmPassword,
                       obscureText: _isObscure1,
@@ -113,12 +119,15 @@ class _RegisterPageState extends State<RegisterPage> {
                               _isObscure1 = !_isObscure1;
                             });
                           },
-                          child: Icon(_isObscure1
-                              ? Icons.visibility_off
-                              : Icons.visibility),
+                          child: Icon(
+                            _isObscure1
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: themeData.colorScheme.shadow,
+                          ),
                         ),
                         hintText: 'Confirm Password',
-                        hintStyle: textTheme.titleLarge,
+                        hintStyle: themeData.textTheme.titleLarge,
                         border: OutlineInputBorder(
                           borderSide: BorderSide(
                               color: themeData.colorScheme.secondary),
@@ -141,24 +150,31 @@ class _RegisterPageState extends State<RegisterPage> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
+                            backgroundColor: themeData.colorScheme.shadow,
                             title: Text(
                               'Error',
-                              style: textTheme.titleLarge?.copyWith(
-                                  color: themeData.colorScheme.shadow),
+                              style: themeData.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: themeData.colorScheme.tertiary),
                             ),
                             content: Text(
                               'Please enter valid details',
-                              style: textTheme.titleLarge,
+                              style: themeData.textTheme.titleLarge?.copyWith(
+                                  color: themeData.colorScheme.tertiary),
                             ),
                             actions: [
                               TextButton(
+                                style: ButtonStyle(
+                                    backgroundColor: WidgetStatePropertyAll(
+                                        themeData.colorScheme.tertiary)),
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
                                 child: Text(
                                   'Close',
-                                  style: textTheme.titleLarge?.copyWith(
-                                      color: themeData.colorScheme.shadow),
+                                  style: themeData.textTheme.titleLarge
+                                      ?.copyWith(
+                                          color: themeData.colorScheme.shadow),
                                 ),
                               )
                             ],
@@ -169,30 +185,40 @@ class _RegisterPageState extends State<RegisterPage> {
                       _confirmPassword.text.isNotEmpty) {
                     if (_password.text.length < 8 ||
                         _confirmPassword.text.length < 8) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content:
-                              Text('Password length must be greater than 8')));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          backgroundColor: themeData.colorScheme.shadow,
+                          content: Text(
+                            'Password length must be greater than 8',
+                            style: themeData.textTheme.titleLarge?.copyWith(
+                                color: themeData.colorScheme.tertiary),
+                          )));
                     }
                     if (_password.text != _confirmPassword.text) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Passwords do not match')));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          backgroundColor: themeData.colorScheme.shadow,
+                          content: Text(
+                            'Passwords do not match',
+                            style: themeData.textTheme.titleLarge?.copyWith(
+                                color: themeData.colorScheme.tertiary),
+                          )));
                     }
                   }
 
                   _registerUser(
                       context: context,
                       email: _email.text,
-                      password: _password.text);
+                      password: _password.text,
+                      themeData: themeData);
                 },
                 child: Container(
                   height: 48,
                   decoration: BoxDecoration(
-                      color: themeData.colorScheme.primary,
+                      color: themeData.colorScheme.shadow,
                       borderRadius: BorderRadius.circular(12)),
                   child: Center(
                     child: Text(
                       'Sign Up',
-                      style: textTheme.titleLarge?.copyWith(
+                      style: themeData.textTheme.titleLarge?.copyWith(
                           fontSize: 16, color: themeData.colorScheme.tertiary),
                     ),
                   ),
@@ -204,7 +230,7 @@ class _RegisterPageState extends State<RegisterPage> {
               children: [
                 Text(
                   'Already have an account?',
-                  style: textTheme.titleLarge,
+                  style: themeData.textTheme.titleLarge,
                 ),
                 TextButton(
                   onPressed: () {
@@ -220,7 +246,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   child: Text(
                     'Login Here!',
-                    style: textTheme.titleLarge?.copyWith(
+                    style: themeData.textTheme.titleLarge?.copyWith(
                         color: themeData.colorScheme.shadow,
                         fontWeight: FontWeight.w500),
                   ),
@@ -236,7 +262,8 @@ class _RegisterPageState extends State<RegisterPage> {
   _registerUser(
       {required BuildContext context,
       required String email,
-      required String password}) async {
+      required String password,
+      required ThemeData themeData}) async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     String errorMessage = 'An error has occurred. Please try again later.';
     try {
@@ -265,17 +292,21 @@ class _RegisterPageState extends State<RegisterPage> {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: themeData.colorScheme.shadow,
               title: Text(
                 'Success',
-                style: textTheme.titleLarge
+                style: themeData.textTheme.titleLarge
                     ?.copyWith(color: themeData.colorScheme.shadow),
               ),
               content: Text(
                 'Account Created Successfully',
-                style: textTheme.titleLarge,
+                style: themeData.textTheme.titleLarge,
               ),
               actions: [
                 TextButton(
+                  style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(
+                          themeData.colorScheme.tertiary)),
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                         // ignore: use_build_context_synchronously
@@ -286,7 +317,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                   child: Text(
                     'Login',
-                    style: textTheme.titleLarge
+                    style: themeData.textTheme.titleLarge
                         ?.copyWith(color: themeData.colorScheme.shadow),
                   ),
                 )
@@ -307,23 +338,29 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
+            backgroundColor: themeData.colorScheme.shadow,
             title: Text(
               'Registration Error',
-              style: textTheme.titleLarge
-                  ?.copyWith(color: themeData.colorScheme.shadow),
+              style: themeData.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: themeData.colorScheme.tertiary),
             ),
             content: Text(
               errorMessage,
-              style: textTheme.titleLarge,
+              style: themeData.textTheme.titleLarge
+                  ?.copyWith(color: themeData.colorScheme.tertiary),
             ),
             actions: [
               TextButton(
+                style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStatePropertyAll(themeData.colorScheme.tertiary)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
                 child: Text(
                   'Close',
-                  style: textTheme.titleLarge
+                  style: themeData.textTheme.titleLarge
                       ?.copyWith(color: themeData.colorScheme.shadow),
                 ),
               ),
