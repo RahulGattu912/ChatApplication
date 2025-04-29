@@ -1,3 +1,4 @@
+import 'package:chat_app_demo/provider/chat_room_id_provider.dart';
 import 'package:chat_app_demo/themes/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class ChatMessages extends StatefulWidget {
 
 class _ChatMessagesState extends State<ChatMessages> {
   FocusNode focusNode = FocusNode();
+  Set<String> selectedMessageIds = {};
+
   @override
   void initState() {
     super.initState();
@@ -79,36 +82,76 @@ class _ChatMessagesState extends State<ChatMessages> {
   Widget _buildMessageItem(DocumentSnapshot doc, ThemeData themeData) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     bool isSender = data['senderId'] == widget.senderId;
+    String messageId = doc.id;
+    bool isSelected = selectedMessageIds.contains(messageId);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Align(
-        alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          decoration: BoxDecoration(
-            color: isSender ? Colors.green : Colors.grey[300],
-            borderRadius: BorderRadius.only(
-              topLeft: isSender ? const Radius.circular(12) : Radius.zero,
-              topRight: isSender ? Radius.zero : const Radius.circular(12),
-              bottomLeft: const Radius.circular(12),
-              bottomRight: const Radius.circular(12),
-            ),
-          ),
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-            child: Text(data['message'],
-                style: themeData.textTheme.titleLarge?.copyWith(
-                    color: isSender ? Colors.white : Colors.black54,
-                    fontSize: 16)
-                // TextStyle(
+    return Consumer<ChatRoomIdProvider>(builder: (context, provider, _) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          setState(() {
+            if (isSelected) {
+              selectedMessageIds.remove(messageId);
+              provider.removeSelectedMessage(messageId: messageId);
+            }
+          });
+        },
+        onLongPress: () {
+          setState(() {
+            if (isSelected) {
+              selectedMessageIds.remove(messageId);
+              provider.removeSelectedMessage(messageId: messageId);
+            } else {
+              selectedMessageIds.add(messageId);
+              provider.addToSelectedMessage(messageId: messageId);
+            }
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Stack(
+            children: [
+              Align(
+                alignment:
+                    isSender ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isSender ? Colors.green : Colors.grey[300],
+                    borderRadius: BorderRadius.only(
+                      topLeft:
+                          isSender ? const Radius.circular(12) : Radius.zero,
+                      topRight:
+                          isSender ? Radius.zero : const Radius.circular(12),
+                      bottomLeft: const Radius.circular(12),
+                      bottomRight: const Radius.circular(12),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 10.0),
+                    child: Text(data['message'],
+                        style: themeData.textTheme.titleLarge?.copyWith(
+                            color: isSender ? Colors.white : Colors.black54,
+                            fontSize: 16)
+                        // TextStyle(
 
-                //     fontSize: 16,
-                //     color: isSender ? Colors.white : Colors.black54),
+                        //     fontSize: 16,
+                        //     color: isSender ? Colors.white : Colors.black54),
+                        ),
+                  ),
                 ),
+              ),
+              if (isSelected)
+                Positioned.fill(
+                    child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.withValues(alpha: 0.3)),
+                ))
+            ],
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

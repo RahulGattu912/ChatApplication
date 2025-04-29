@@ -1,4 +1,4 @@
-import 'package:chat_app_demo/chat/chat_room_id_provider.dart';
+import 'package:chat_app_demo/provider/chat_room_id_provider.dart';
 import 'package:chat_app_demo/home/home_page.dart';
 import 'package:chat_app_demo/login/login_page.dart';
 import 'package:chat_app_demo/themes/theme_provider.dart';

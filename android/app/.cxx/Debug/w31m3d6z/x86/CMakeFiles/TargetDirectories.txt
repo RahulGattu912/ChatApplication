@@ -1,0 +1,2 @@
+/Users/rahulgattu/Desktop/rahul/ChatApplication/android/app/.cxx/Debug/w31m3d6z/x86/CMakeFiles/edit_cache.dir
+/Users/rahulgattu/Desktop/rahul/ChatApplication/android/app/.cxx/Debug/w31m3d6z/x86/CMakeFiles/rebuild_cache.dir
