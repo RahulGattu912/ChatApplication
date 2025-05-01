@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:chat_app_demo/chat/chat_messages.dart';
-import 'package:chat_app_demo/themes/theme_provider.dart';
+import 'package:chat_app_demo/provider/theme_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -54,15 +54,24 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   void _clearChat() async {
+    await Future.delayed(
+      const Duration(seconds: 5),
+    );
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('chat_room')
         .doc(chatRoomId)
         .collection('messages')
+        .orderBy('timeStamp', descending: false)
+        .limit(1)
         .get();
 
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+    QueryDocumentSnapshot doc = querySnapshot.docs.first;
+    if (doc.exists) {
       await doc.reference.delete();
     }
+    // for (QueryDocumentSnapshot doc in querySnapshot.docs.reversed) {
+    // await doc.reference.delete();
+    // }
   }
 
   String _generateId(String senderId, String receiverId) {
@@ -118,6 +127,7 @@ class _ChatRoomState extends State<ChatRoom> {
                 children: [
                   Expanded(
                       child: TextField(
+                    textCapitalization: TextCapitalization.words,
                     style: themeData.textTheme.titleLarge
                         ?.copyWith(color: themeData.colorScheme.tertiary),
                     cursorColor: themeData.colorScheme.tertiary,
@@ -135,25 +145,38 @@ class _ChatRoomState extends State<ChatRoom> {
                             borderSide: BorderSide(
                                 color: themeData.colorScheme.primary))),
                   )),
-                  IconButton(
-                      onPressed: () async {
-                        if (message.text.isNotEmpty) {
-                          _sendMessage(
-                              message: message.text,
-                              receiverId: widget.receiverID,
-                              senderId: widget.senderID,
-                              roomId: chatRoomId);
-                          message.clear();
-                          await Future.delayed(const Duration(seconds: 5), () {
-                            _clearChat();
-                          });
-                        }
-                      },
-                      icon: Icon(
-                        Icons.send,
+                  const SizedBox(
+                    width: 4,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Container(
+                      height: 52,
+                      width: 51,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
                         color: themeData.colorScheme.shadow,
-                        size: 32,
-                      ))
+                      ),
+                      child: IconButton(
+                          onPressed: () async {
+                            if (message.text.isNotEmpty) {
+                              _sendMessage(
+                                  message: message.text,
+                                  receiverId: widget.receiverID,
+                                  senderId: widget.senderID,
+                                  roomId: chatRoomId);
+                              message.clear();
+
+                              _clearChat();
+                            }
+                          },
+                          icon: Icon(
+                            Icons.send,
+                            color: themeData.colorScheme.tertiary,
+                            size: 28,
+                          )),
+                    ),
+                  )
                 ],
               )
             ],

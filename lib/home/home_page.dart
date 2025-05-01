@@ -1,6 +1,6 @@
 import 'package:chat_app_demo/chat/users.dart';
 import 'package:chat_app_demo/login/login_page.dart';
-import 'package:chat_app_demo/themes/theme_provider.dart';
+import 'package:chat_app_demo/provider/theme_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app_demo/settings/settings.dart';

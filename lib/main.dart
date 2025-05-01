@@ -1,7 +1,7 @@
-import 'package:chat_app_demo/chat/chat_room_id_provider.dart';
+import 'package:chat_app_demo/provider/chat_room_id_provider.dart';
 import 'package:chat_app_demo/home/home_page.dart';
 import 'package:chat_app_demo/login/login_page.dart';
-import 'package:chat_app_demo/themes/theme_provider.dart';
+import 'package:chat_app_demo/provider/theme_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "624074834385",
     "project_id": "chatapp-ca5dd",
-    "storage_bucket": "chatapp-ca5dd.appspot.com"
+    "storage_bucket": "chatapp-ca5dd.firebasestorage.app"
   },
   "client": [
     {

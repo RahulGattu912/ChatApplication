@@ -1,4 +1,5 @@
-import 'package:chat_app_demo/themes/theme_provider.dart';
+import 'package:chat_app_demo/provider/theme_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       value: provider.isDarkMode,
                       onChanged: (value) {
                         setState(() {
-                          isSwitched = value;
+                          // isSwitched = value;
                           provider.toggleTheme();
                         });
                       },
@@ -51,6 +52,32 @@ class _SettingsPageState extends State<SettingsPage> {
                       activeTrackColor: themeData.colorScheme.shadow,
                     ),
                   ],
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    _deleteUser();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                        color: Colors.red[100],
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.delete, color: Colors.red),
+                        const SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          'Delete Account',
+                          style: themeData.textTheme.titleLarge
+                              ?.copyWith(color: Colors.red, fontSize: 20),
+                        )
+                      ],
+                    ),
+                  ),
                 )
               ],
             ),
@@ -58,5 +85,20 @@ class _SettingsPageState extends State<SettingsPage> {
         );
       },
     );
+  }
+
+  Future<void> _deleteUser() async {
+    try {
+      await FirebaseAuth.instance.currentUser?.delete();
+// ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account Deleted Successfully')));
+    } catch (e) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Failed to delete account. Please reauthenticate.')),
+      );
+    }
   }
 }
